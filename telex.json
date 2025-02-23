@@ -1,7 +1,7 @@
 {
     "name": "telex-legal-assist",
     "type": "modifier",
-    "descriptions": "A chatbot that provides instant legal guidance by refining queries, categorizing them, and offering legal responses or references.",
+    "description": "A chatbot that provides instant legal guidance by refining queries, categorizing them, and offering legal responses or references.",
     "settings": {
         "api_url": {
             "type": "string",
