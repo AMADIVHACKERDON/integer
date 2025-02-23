@@ -1,0 +1,32 @@
+{
+    "name": "telex-legal-assist",
+    "type": "modifier",
+    "description": "A chatbot that provides instant legal guidance by refining queries, categorizing them, and offering legal responses or references.",
+    "settings": {
+      "api_url": {
+        "type": "string",
+        "required": true,
+        "description": "The API endpoint for processing legal queries and retrieving responses."
+      },
+      "fallback_resource_url": {
+        "type": "string",
+        "required": true,
+        "description": "A default legal resource URL to use if no precise answer is found."
+      }
+    },
+    "modifies": {
+      "input": true,
+      "output": false
+    },
+    "commands": [
+      {
+        "command": "/legal",
+        "description": "Ask a legal question and get an instant response."
+      }
+    ],
+    "permissions": {
+      "allow_public": false,
+      "allow_private_channels": true
+    }
+  }
+  
