@@ -1,41 +1,46 @@
 {
-    "name": "telex-legal-assist",
-    "type": "modifier",
+  "data": {
+    "date": {
+      "created_at": "2025-02-24",
+      "updated_at": "2025-02-24"
+    },
     "descriptions": {
-        "app_name": "Telex Legal Assist",
-        "app_description": "A chatbot that provides instant legal guidance by refining queries, categorizing them, and offering legal responses or references.",
-        "app_logo": "https://your-logo-url.com/logo.png",
-        "app_url": "https://integer-i9u8.onrender.com/",
-        "background_color": "#FFFFFF"
+      "app_name": "Telex Legal Assist",
+      "app_description": "A chatbot that provides instant legal guidance by refining queries, categorizing them, and offering legal responses or references.",
+      "app_logo": "https://upload.wikimedia.org/wikipedia/commons/7/76/Slack_Icon.png",
+      "app_url": "https://integer-i9u8.onrender.com/",
+      "background_color": "#FFFFFF"
     },
-    "settings": {
-        "api_url": {
-            "type": "string",
-            "required": true,
-            "description": "The API endpoint for processing legal queries and retrieving responses."
-        },
-        "fallback_resource_url": {
-            "type": "string",
-            "required": true,
-            "description": "A default legal resource URL to use if no precise answer is found."
-        }
-    },
-    "data": {
-        "api_url": "https://integer-i9u8.onrender.com/",
-        "fallback_resource_url": "https://your-legal-resource.com"
-    },
-    "modifies": {
-        "input": true,
-        "output": false
-    },
-    "commands": [
-        {
-            "command": "/legal",
-            "description": "Ask a legal question and get an instant response."
-        }
+    "integration_category": "Legal Assistance",
+    "integration_type": "modifier",
+    "is_active": true,
+    "output": [],
+    "key_features": [
+      "Instant legal query refinement and categorization.",
+      "Provides relevant legal references and responses.",
+      "Fallback to external legal resources if needed.",
+      "Seamless API integration for automated legal assistance."
     ],
     "permissions": {
-        "allow_public": false,
-        "allow_private_channels": true
-    }
+      "legal_assist_user": {
+        "always_online": true,
+        "display_name": "Legal Assist Bot"
+      }
+    },
+    "settings": [
+      {
+        "label": "API Endpoint",
+        "type": "text",
+        "required": true,
+        "default": "https://integer-i9u8.onrender.com/"
+      },
+      {
+        "label": "Fallback Resource URL",
+        "type": "text",
+        "required": true,
+        "default": "https://your-legal-resource.com"
+      }
+    ],
+    "target_url": "https://integer-i9u8.onrender.com/"
+  }
 }
