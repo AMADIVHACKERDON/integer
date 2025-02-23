@@ -3,30 +3,33 @@
     "type": "modifier",
     "description": "A chatbot that provides instant legal guidance by refining queries, categorizing them, and offering legal responses or references.",
     "settings": {
-      "api_url": {
-        "type": "string",
-        "required": true,
-        "description": "The API endpoint for processing legal queries and retrieving responses."
-      },
-      "fallback_resource_url": {
-        "type": "string",
-        "required": true,
-        "description": "A default legal resource URL to use if no precise answer is found."
-      }
+        "api_url": {
+            "type": "string",
+            "required": true,
+            "description": "The API endpoint for processing legal queries and retrieving responses."
+        },
+        "fallback_resource_url": {
+            "type": "string",
+            "required": true,
+            "description": "A default legal resource URL to use if no precise answer is found."
+        }
+    },
+    "data": {
+        "api_url": "https://integer-i9u8.onrender.com/",
+        "fallback_resource_url": "https://your-legal-resource.com"
     },
     "modifies": {
-      "input": true,
-      "output": false
+        "input": true,
+        "output": false
     },
     "commands": [
-      {
-        "command": "/legal",
-        "description": "Ask a legal question and get an instant response."
-      }
+        {
+            "command": "/legal",
+            "description": "Ask a legal question and get an instant response."
+        }
     ],
     "permissions": {
-      "allow_public": false,
-      "allow_private_channels": true
+        "allow_public": false,
+        "allow_private_channels": true
     }
-  }
-  
+}
