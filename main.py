@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from datetime import date
 
 app = FastAPI()
 
@@ -29,44 +30,49 @@ def process_legal_query(text):
 @app.get("/telex.json")
 def get_json():
     data = {
-        "name": "telex-legal-assist",
-        "type": "modifier",
-        "description": {
-            "app_name": "Telex Legal Assist",
-            "app_description": "A chatbot that provides instant legal guidance by refining queries, categorizing them, and offering legal responses or references.",
-            "app_logo": "https://your-logo-url.com/logo.png",
-            "app_url": "https://your-app-url.com",
-            "background_color": "#FFFFFF"
-        },
-        "settings": {
-            "api_url": {
-                "type": "string",
-                "required": True,
-                "description": "The API endpoint for processing legal queries and retrieving responses."
-            },
-            "fallback_resource_url": {
-                "type": "string",
-                "required": True,
-                "description": "A default legal resource URL to use if no precise answer is found."
-            }
-        },
         "data": {
-            "api_url": "https://your-deployed-url.com/webhook",
-            "fallback_resource_url": "https://your-legal-resource.com"
-        },
-        "modifies": {
-            "input": True,
-            "output": False
-        },
-        "commands": [
-            {
-                "command": "/legal",
-                "description": "Ask a legal question and get an instant response."
-            }
-        ],
-        "permissions": {
-            "allow_public": False,
-            "allow_private_channels": True
+            "date": {
+                "created_at": str(date.today()),
+                "updated_at": str(date.today())
+            },
+            "descriptions": {
+                "app_name": "Telex Legal Assist",
+                "app_description": "A chatbot that provides instant legal guidance by refining queries, categorizing them, and offering legal responses or references.",
+                "app_logo": "https://upload.wikimedia.org/wikipedia/commons/7/76/Slack_Icon.png",
+                "app_url": "https://integer-i9u8.onrender.com/",
+                "background_color": "#FFFFFF"
+            },
+            "integration_category": "Legal Assistance",
+            "integration_type": "modifier",
+            "is_active": True,
+            "output": [],
+            "key_features": [
+                "Instant legal query refinement and categorization.",
+                "Provides relevant legal references and responses.",
+                "Fallback to external legal resources if needed.",
+                "Seamless API integration for automated legal assistance."
+            ],
+            "permissions": {
+                "legal_assist_user": {
+                    "always_online": True,
+                    "display_name": "Legal Assist Bot"
+                }
+            },
+            "settings": [
+                {
+                    "label": "API Endpoint",
+                    "type": "text",
+                    "required": True,
+                    "default": "https://integer-i9u8.onrender.com/webhook"
+                },
+                {
+                    "label": "Fallback Resource URL",
+                    "type": "text",
+                    "required": True,
+                    "default": "https://your-legal-resource.com"
+                }
+            ],
+            "target_url": "https://integer-i9u8.onrender.com/webhook"
         }
     }
     return JSONResponse(content=data)
