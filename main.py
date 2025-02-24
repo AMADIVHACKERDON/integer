@@ -2,10 +2,14 @@ import httpx
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from datetime import date
+import logging
 
 app = FastAPI()
 
 TELEX_WEBHOOK_URL = "https://ping.telex.im/v1/webhooks/0195398f-142c-7bb1-8c3c-887c4cc8c133"
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
 
 @app.get("/")
 def home():
@@ -14,24 +18,38 @@ def home():
 @app.post("/webhook")
 async def receive_message(request: Request):
     try:
-        body = await request.body()
-        if not body:
-            raise HTTPException(status_code=400, detail="Empty request body")
+        # Read JSON request
+        body = await request.json()
+        logging.info(f"Received payload: {body}")
 
-        data = await request.json()
-        message = data.get("text", "").strip()
+        # Validate required fields
+        required_fields = ["event_name", "username", "status", "message"]
+        missing_fields = [field for field in required_fields if field not in body]
 
-        if not message:
-            raise HTTPException(status_code=400, detail="'text' field is required in JSON")
+        if missing_fields:
+            return JSONResponse(
+                status_code=400, 
+                content={"error": f"Missing required fields: {', '.join(missing_fields)}"}
+            )
+
+        # Extract data
+        event_name = body["event_name"]
+        username = body["username"]
+        status = body["status"]
+        message = body["message"]
 
         # Process the legal query
         response_text = process_legal_query(message)
 
-        # Forward the response to the Telex webhook
+        # Forward to Telex
         async with httpx.AsyncClient() as client:
-            telex_response = await client.post(TELEX_WEBHOOK_URL, json={"text": response_text})
+            telex_response = await client.post(
+                TELEX_WEBHOOK_URL, 
+                json={"event_name": event_name, "username": username, "status": status, "message": response_text}
+            )
 
         if telex_response.status_code != 200:
+            logging.error(f"Telex Error: {telex_response.text}")
             return JSONResponse(
                 status_code=500, 
                 content={"error": "Failed to forward message to Telex", "details": telex_response.text}
@@ -40,6 +58,7 @@ async def receive_message(request: Request):
         return {"response": response_text, "telex_status": "Forwarded to Telex"}
 
     except Exception as e:
+        logging.error(f"Error processing webhook: {str(e)}")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 def process_legal_query(text: str) -> str:
