@@ -48,14 +48,17 @@ async def receive_message(request: Request):
                 json={"event_name": event_name, "username": username, "status": status, "message": response_text}
             )
 
-        if telex_response.status_code != 200:
-            logging.error(f"Telex Error: {telex_response.text}")
+        if telex_response.status_code not in [200, 202]:  # Accepting 202 as a success status
             return JSONResponse(
                 status_code=500, 
                 content={"error": "Failed to forward message to Telex", "details": telex_response.text}
             )
 
-        return {"response": response_text, "telex_status": "Forwarded to Telex"}
+        return {
+            "response": response_text,
+            "telex_status": "Message forwarded successfully",
+            "task_id": telex_response.json().get("task_id")
+        }
 
     except Exception as e:
         logging.error(f"Error processing webhook: {str(e)}")
