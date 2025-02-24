@@ -10,14 +10,21 @@ def home():
 
 @app.post("/webhook")
 async def receive_message(request: Request):
-    data = await request.json()
-    message = data.get("text", "")
+    try:
+        body = await request.body()
+        if not body:  # Check if body is empty
+            return JSONResponse(status_code=400, content={"error": "Empty request body"})
 
-    # Process legal query
-    response = process_legal_query(message)
+        data = await request.json()
+        message = data.get("text", "")
 
-    return {"response": response}
+        if not message:
+            return JSONResponse(status_code=400, content={"error": "'text' field is required in JSON"})
 
+        return {"response": f"Received message: {message}"}
+
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
 def process_legal_query(text):
     # Basic legal query processor (Example)
     if "contract" in text.lower():
