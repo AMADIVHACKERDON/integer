@@ -42,7 +42,7 @@ def get_json():
                 "app_url": "https://integer-i9u8.onrender.com/",
                 "background_color": "#FFFFFF"
             },
-            "integration_category": "Legal Assistance",
+            "integration_category": "Communication & Collaboration",
             "integration_type": "modifier",
             "is_active": True,
             "output": [],
