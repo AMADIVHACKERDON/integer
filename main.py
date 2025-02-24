@@ -1,8 +1,11 @@
-from fastapi import FastAPI, Request
+import httpx
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from datetime import date
 
 app = FastAPI()
+
+TELEX_WEBHOOK_URL = "https://ping.telex.im/v1/webhooks/0195398f-142c-7bb1-8c3c-887c4cc8c133"
 
 @app.get("/")
 def home():
@@ -12,30 +15,47 @@ def home():
 async def receive_message(request: Request):
     try:
         body = await request.body()
-        if not body:  # Check if body is empty
-            return JSONResponse(status_code=400, content={"error": "Empty request body"})
+        if not body:
+            raise HTTPException(status_code=400, detail="Empty request body")
 
         data = await request.json()
-        message = data.get("text", "")
+        message = data.get("text", "").strip()
 
         if not message:
-            return JSONResponse(status_code=400, content={"error": "'text' field is required in JSON"})
+            raise HTTPException(status_code=400, detail="'text' field is required in JSON")
 
-        return {"response": f"Received message: {message}"}
+        # Process the legal query
+        response_text = process_legal_query(message)
+
+        # Forward the response to the Telex webhook
+        async with httpx.AsyncClient() as client:
+            telex_response = await client.post(TELEX_WEBHOOK_URL, json={"text": response_text})
+
+        if telex_response.status_code != 200:
+            return JSONResponse(
+                status_code=500, 
+                content={"error": "Failed to forward message to Telex", "details": telex_response.text}
+            )
+
+        return {"response": response_text, "telex_status": "Forwarded to Telex"}
 
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
-def process_legal_query(text):
-    # Basic legal query processor (Example)
-    if "contract" in text.lower():
+
+def process_legal_query(text: str) -> str:
+    """Processes legal queries and returns responses."""
+    text = text.lower()
+    
+    if "contract" in text:
         return "A contract is a legally binding agreement. Need more details?"
-    elif "divorce" in text.lower():
+    elif "divorce" in text:
         return "Divorce laws vary by country. Do you need guidance on filing?"
+    
     return "Sorry, I couldn't find relevant legal info. Try rephrasing."
 
-# Serve Telex integration JSON
 @app.get("/telex.json")
 def get_json():
+    """Serves Telex integration JSON for webhook configuration."""
     data = {
         "data": {
             "date": {
