@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 def home():
     return {"message": "Welcome to the Legal Assist Chatbot"}
 
-@app.get("/webhook")
+@app.post("/webhook")
 async def receive_message(request: Request):
     try:
         # Read JSON request
