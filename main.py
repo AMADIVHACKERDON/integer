@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 def home():
     return {"message": "Welcome to the Legal Assist Chatbot"}
 
-@app.post("/webhook")
+@app.post("/webhook")  # ✅ Change from GET to POST
 async def receive_message(request: Request):
     try:
         # Read JSON request
@@ -28,7 +28,7 @@ async def receive_message(request: Request):
 
         if missing_fields:
             return JSONResponse(
-                status_code=400, 
+                status_code=400,
                 content={"error": f"Missing required fields: {', '.join(missing_fields)}"}
             )
 
@@ -41,23 +41,35 @@ async def receive_message(request: Request):
         # Process the legal query
         response_text = process_legal_query(message)
 
-        # Forward to Telex
+        # Forward both user message & response to Telex
         async with httpx.AsyncClient() as client:
             telex_response = await client.post(
-                TELEX_WEBHOOK_URL, 
-                json={"event_name": event_name, "username": username, "status": status, "message": response_text}
+                TELEX_WEBHOOK_URL,
+                json={
+                    "event_name": event_name,
+                    "username": username,
+                    "status": status,
+                    "message": message,  # ✅ Include the original message
+                    "bot_response": response_text  # ✅ Send processed response separately
+                }
             )
 
-        if telex_response.status_code not in [200, 202]:  # Accepting 202 as a success status
+        # Handle Telex Response
+        try:
+            telex_json = telex_response.json()
+        except Exception:
+            telex_json = {}
+
+        if telex_response.status_code not in [200, 202]:
             return JSONResponse(
-                status_code=500, 
+                status_code=500,
                 content={"error": "Failed to forward message to Telex", "details": telex_response.text}
             )
 
         return {
             "response": response_text,
             "telex_status": "Message forwarded successfully",
-            "task_id": telex_response.json().get("task_id")
+            "task_id": telex_json.get("task_id", "Unknown")
         }
 
     except Exception as e:
